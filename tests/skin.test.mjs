@@ -10,7 +10,7 @@ const manifest = JSON.parse(await readFile(resolve(dist, 'manifest.json'), 'utf8
 
 test('the reverse extension has its own manifest and limits permissions', () => {
   assert.equal(manifest.name, 'YouTube');
-  assert.equal(manifest.version, '0.3.2');
+  assert.equal(manifest.version, '0.3.3');
   assert.deepEqual(manifest.permissions, ['storage']);
   assert.ok(manifest.content_scripts[0].matches.includes('https://vkvideo.ru/*'));
   assert.ok(manifest.content_scripts[1].matches.includes('https://cabinet.vkvideo.ru/*'));
@@ -66,6 +66,18 @@ test('site skin changes appearance while native actions and links work', async (
     assert.equal(await page.locator('[data-testid="main_menu_clips"]').innerText(), 'Shorts');
     assert.equal(await page.locator('[data-testid="video_card_thumb"]').getAttribute('href'), '/video-1');
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(15, 15, 15)');
+    await page.evaluate(() => {
+      const link = document.createElement('button');
+      link.className = 'vkuiButton__modeLink';
+      link.style.color = 'rgb(55, 112, 177)';
+      link.textContent = 'Регистрация';
+      const tab = document.createElement('div');
+      tab.className = 'vkuiTabsItem__selected';
+      tab.innerHTML = '<span class="vkuiTabsItem__label" style="color:rgb(55,112,177)">Все</span>';
+      document.querySelector('#spa_root').append(link, tab);
+    });
+    assert.equal(await page.locator('.vkuiButton__modeLink').evaluate(e => getComputedStyle(e).color), 'rgb(255, 77, 109)');
+    assert.equal(await page.locator('.vkuiTabsItem__label').evaluate(e => getComputedStyle(e).color), 'rgb(15, 15, 15)');
     await page.locator('#play').click();
     assert.equal(await page.locator('body').getAttribute('data-played'), 'yes');
     await page.evaluate(() => { document.documentElement.className = 'dark-theme'; });
@@ -169,6 +181,13 @@ test('studio skin leaves content table and upload action usable', async () => {
     await page.locator('#upload').click();
     assert.equal(await page.locator('body').getAttribute('data-upload'), 'opened');
     assert.ok((await page.locator('html').getAttribute('class')).includes('vky-content'));
+    await page.evaluate(() => {
+      const link = document.createElement('button');
+      link.className = 'vkuiButton__modeLink';
+      link.style.color = 'rgb(55, 112, 177)';
+      document.querySelector('#spa_root').append(link);
+    });
+    assert.equal(await page.locator('.vkuiButton__modeLink').evaluate(e => getComputedStyle(e).color), 'rgb(255, 77, 109)');
   } finally { await context.close(); }
 });
 

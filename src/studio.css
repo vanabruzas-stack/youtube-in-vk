@@ -7,7 +7,7 @@ html.vky-studio {
   --vky-line: #383838;
   --vky-text: #f1f1f1;
   --vky-muted: #aaa;
-  --vky-blue: #ff0033;
+  --vky-red: #ff0033;
 }
 html.vky-studio #spa_root,
 html.vky-studio #spa_root .vkui--vkBase--light,
@@ -18,7 +18,10 @@ html.vky-studio #spa_root .vkui--vkBase--dark {
   --vkui--color_text_primary: #f1f1f1 !important;
   --vkui--color_text_secondary: #aaa !important;
   --vkui--color_text_link: #ff4d6d !important;
+  --vkui--color_text_accent: #ff4d6d !important;
+  --vkui--color_text_link_visited: #ff667f !important;
   --vkui--color_icon_accent: #ff0033 !important;
+  --vkui--color_stroke_accent: #ff0033 !important;
   --vkui--color_background_accent: #ff0033 !important;
 }
 html.vky-studio body,
@@ -144,7 +147,10 @@ html.vky-studio [role="tab"][aria-selected="true"] {
 }
 html.vky-studio .vkuiButton__host,
 html.vky-studio .vkuiButton__host::before { border-radius: 4px !important; }
-html.vky-studio .vkuiButton__modePrimary { background: var(--vky-blue) !important; color: #0f0f0f !important; }
+html.vky-studio .vkuiButton__modePrimary { background: var(--vky-red) !important; color: #0f0f0f !important; }
+html.vky-studio .vkuiButton__modeLink,
+html.vky-studio .vkuiButton__modeLink .vkuiButton__in,
+html.vky-studio .vkuiButton__modeLink .vkuiButton__content { color: #ff4d6d !important; }
 html.vky-studio .vkuiButton__modeSecondary,
 html.vky-studio .vkuiButton__modeTertiary { background: var(--vky-raised) !important; color: var(--vky-text) !important; }
 html.vky-studio .vkuiFormField__host,
