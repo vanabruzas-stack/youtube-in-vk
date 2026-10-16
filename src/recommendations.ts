@@ -1,12 +1,14 @@
-type FeaturedVideo = { href: string; title: string; image: string; duration?: string };
+import { localViews } from './local-metrics';
+
+type FeaturedVideo = { href: string; title: string; image: string; duration?: string; views?: string };
 
 const CHANNEL = 'https://vkvideo.ru/@redmuzzlevideo';
 const STORAGE_KEY = 'vkyFeaturedVideos';
 const fallback: FeaturedVideo[] = [
-  { href: 'https://vkvideo.ru/video-227589072_456239417', title: 'ЧИТЕР КУПИЛ АДМИНКУ И УНИЧТОЖИЛ СЕРВЕР - GTA 5 RP', image: 'https://sun9-4.vkuserphoto.ru/s/v1/ig2/7HmNqMORO0XVKJ8GwhQkoKVow7Pt7uVNNtttzeNKTlrL2Jslh6uKtAAK_i7Jt4n8LQ1JFydGCzPPcGz2SIS4EmF5.jpg?quality=95&size=320x180', duration: '11:20' },
-  { href: 'https://vkvideo.ru/video-227589072_456239161', title: 'Обыграй Карателя, Выиграй $200,000,000 - GTA 5 RP', image: 'https://sun9-37.vkuserphoto.ru/s/v1/ig2/7q359BsBmWKwBwPmdYzE4lDLUrX-kCpdWnXl5FnNqapaLRFHDTgU8O4pMPdZ3z8RV-4_7vicXVYTw76FTV2PYmpi.jpg?quality=95&size=320x180', duration: '12:59' },
-  { href: 'https://vkvideo.ru/video-227589072_456239165', title: 'Я уничтожил GTA RP сервер за 24 часа', image: 'https://sun9-80.vkuserphoto.ru/s/v1/ig2/VV_8owdDA4aQy6ZqDPtI369ZbiSRUlCK2UStwV_nMLBrRFvRWmOuxnkL4IHZ1ruLawle6rGSabL3_N5yH7ocL8u4.jpg?quality=95&size=320x180', duration: '8:44' },
-  { href: 'https://vkvideo.ru/video-227589072_456239175', title: 'АД В НЕБЕ: КАК ОДИН ЧИТЕР УНИЧТОЖИЛ ВЕСЬ СЕРВЕР В GTA 5 RP', image: 'https://sun9-53.vkuserphoto.ru/s/v1/ig2/zqnvXXFSutlkhzzP4S0wrX5Z2T-5LQo9kH6cT-BV0E07taTpIt6uQ6zNfqVZUVf5TlaIT5v-r1d65gszhVhuq_fN4Pjn0w.jpg?quality=95&size=320x180', duration: '12:35' },
+  { href: 'https://vkvideo.ru/video-227589072_456239417', title: 'ЧИТЕР КУПИЛ АДМИНКУ И УНИЧТОЖИЛ СЕРВЕР - GTA 5 RP', image: 'https://sun9-4.vkuserphoto.ru/s/v1/ig2/7HmNqMORO0XVKJ8GwhQkoKVow7Pt7uVNNtttzeNKTlrL2Jslh6uKtAAK_i7Jt4n8LQ1JFydGCzPPcGz2SIS4EmF5.jpg?quality=95&size=320x180', duration: '11:20', views: '59 просмотров' },
+  { href: 'https://vkvideo.ru/video-227589072_456239161', title: 'Обыграй Карателя, Выиграй $200,000,000 - GTA 5 RP', image: 'https://sun9-37.vkuserphoto.ru/s/v1/ig2/7q359BsBmWKwBwPmdYzE4lDLUrX-kCpdWnXl5FnNqapaLRFHDTgU8O4pMPdZ3z8RV-4_7vicXVYTw76FTV2PYmpi.jpg?quality=95&size=320x180', duration: '12:59', views: '315 тыс просмотров' },
+  { href: 'https://vkvideo.ru/video-227589072_456239165', title: 'Я уничтожил GTA RP сервер за 24 часа', image: 'https://sun9-80.vkuserphoto.ru/s/v1/ig2/VV_8owdDA4aQy6ZqDPtI369ZbiSRUlCK2UStwV_nMLBrRFvRWmOuxnkL4IHZ1ruLawle6rGSabL3_N5yH7ocL8u4.jpg?quality=95&size=320x180', duration: '8:44', views: '55,9 тыс просмотров' },
+  { href: 'https://vkvideo.ru/video-227589072_456239175', title: 'АД В НЕБЕ: КАК ОДИН ЧИТЕР УНИЧТОЖИЛ ВЕСЬ СЕРВЕР В GTA 5 RP', image: 'https://sun9-53.vkuserphoto.ru/s/v1/ig2/zqnvXXFSutlkhzzP4S0wrX5Z2T-5LQo9kH6cT-BV0E07taTpIt6uQ6zNfqVZUVf5TlaIT5v-r1d65gszhVhuq_fN4Pjn0w.jpg?quality=95&size=320x180', duration: '12:35', views: '32,6 тыс просмотров' },
 ];
 
 let videos = fallback;
@@ -41,7 +43,8 @@ function captureChannel(): void {
     if (!image?.src || !image.alt) continue;
     const href = new URL(anchor.href);
     href.search = '';
-    const candidate = { href: href.href, title: image.alt.trim(), image: image.currentSrc || image.src, duration: anchor.textContent?.trim() };
+    const metric = anchor.closest('[data-testid="catalog_item_video"],[data-testid="video_card_layout"]')?.textContent?.match(/\d[\d\s.,]*(?:\s*(?:тыс\.?|млн))?\s*просмотр(?:ов|а|ы)?/iu)?.[0];
+    const candidate = { href: href.href, title: image.alt.trim(), image: image.currentSrc || image.src, duration: anchor.textContent?.trim(), views: metric };
     if (validVideo(candidate)) found.set(href.href, candidate);
     if (found.size >= 16) break;
   }
@@ -78,6 +81,13 @@ function card(video: FeaturedVideo, compact: boolean): HTMLAnchorElement {
   const owner = document.createElement('span');
   owner.textContent = 'РЫЖАЯ МОРДА';
   details.append(title, owner);
+  if (video.views) {
+    const views = document.createElement('span');
+    views.className = 'vky-featured-views';
+    views.textContent = localViews(video.views, video.href);
+    views.title = 'Локальное оформление: реальные просмотры смотрите без расширения';
+    details.append(views);
+  }
   link.append(thumb, details);
   return link;
 }
@@ -85,18 +95,20 @@ function card(video: FeaturedVideo, compact: boolean): HTMLAnchorElement {
 function homeShelf(): void {
   if (location.pathname !== '/') {
     document.getElementById('vky-featured-home')?.remove();
+    document.querySelector('.vky-main-grid')?.classList.remove('vky-main-grid');
     return;
   }
-  const grid = document.querySelector<HTMLElement>('[data-testid="grid"]');
+  const grid = document.querySelector<HTMLElement>('[data-testid="grid"]:has(> [data-testid="grid-item"])');
   if (!grid) return;
-  let shelf = grid.querySelector<HTMLElement>('#vky-featured-home');
+  grid.classList.add('vky-main-grid');
+  let shelf = document.querySelector<HTMLElement>('#vky-featured-home');
   if (!shelf) {
     shelf = document.createElement('section');
     shelf.id = 'vky-featured-home';
-    grid.prepend(shelf);
   }
-  const selection = videos.slice(0, 4);
-  const signature = selection.map(item => item.href).join('|');
+  if (shelf.nextElementSibling !== grid) grid.before(shelf);
+  const selection = videos.slice(0, 3);
+  const signature = JSON.stringify(selection);
   if (shelf.dataset.signature === signature) return;
   shelf.dataset.signature = signature;
   const header = document.createElement('div');
@@ -128,7 +140,7 @@ function watchShelf(): void {
     if (header) header.after(shelf); else recommendations.prepend(shelf);
   }
   const selection = videos.filter(item => new URL(item.href).pathname !== location.pathname).slice(0, 3);
-  const signature = selection.map(item => item.href).join('|');
+  const signature = JSON.stringify(selection);
   if (shelf.dataset.signature === signature) return;
   shelf.dataset.signature = signature;
   const heading = document.createElement('h3');
@@ -150,4 +162,5 @@ export function enhanceRecommendations(): void {
 export function restoreRecommendations(): void {
   document.getElementById('vky-featured-home')?.remove();
   document.getElementById('vky-featured-watch')?.remove();
+  document.querySelector('.vky-main-grid')?.classList.remove('vky-main-grid');
 }

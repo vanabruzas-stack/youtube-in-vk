@@ -1,5 +1,8 @@
 import { STORAGE_KEY, type SkinArea } from './shared';
 
+const version = document.getElementById('vky-version');
+if (version) version.textContent = `Версия ${chrome.runtime.getManifest().version}`;
+
 const toggles = [...document.querySelectorAll<HTMLInputElement>('input[data-area]')];
 chrome.storage.local.get(STORAGE_KEY, result => {
   const values = result[STORAGE_KEY] as Partial<Record<SkinArea, boolean>> | undefined;

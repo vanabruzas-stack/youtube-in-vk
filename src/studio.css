@@ -7,7 +7,7 @@ html.vky-studio {
   --vky-line: #383838;
   --vky-text: #f1f1f1;
   --vky-muted: #aaa;
-  --vky-blue: #3ea6ff;
+  --vky-blue: #ff0033;
 }
 html.vky-studio #spa_root,
 html.vky-studio #spa_root .vkui--vkBase--light,
@@ -17,6 +17,9 @@ html.vky-studio #spa_root .vkui--vkBase--dark {
   --vkui--color_background_secondary: #212121 !important;
   --vkui--color_text_primary: #f1f1f1 !important;
   --vkui--color_text_secondary: #aaa !important;
+  --vkui--color_text_link: #ff4d6d !important;
+  --vkui--color_icon_accent: #ff0033 !important;
+  --vkui--color_background_accent: #ff0033 !important;
 }
 html.vky-studio body,
 html.vky-studio #spa_root {
@@ -214,7 +217,7 @@ html.vky-studio [data-testid="video_dashboard_advanced_table"] img { border-radi
 html.vky-studio [data-testid^="dashboard_filter_"] { border-radius: 8px !important; }
 html.vky-studio .vkuiButton__host,
 html.vky-studio .vkuiButton__host::before { border-radius: 10px !important; }
-html.vky-studio .vkuiButton__modePrimary { background: #3ea6ff !important; }
+html.vky-studio .vkuiButton__modePrimary { background: #ff0033 !important; color: white !important; }
 html.vky-studio .vkuiFormField__host,
 html.vky-studio .vkuiInput__el,
 html.vky-studio .vkuiTextarea__el { border-radius: 8px !important; }

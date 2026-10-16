@@ -1,4 +1,5 @@
 import { installSkin } from './shared';
 import { enhanceSite, restoreSite } from './site-enhance';
 import { enhanceRecommendations, restoreRecommendations } from './recommendations';
-installSkin('site', () => { enhanceSite(); enhanceRecommendations(); }, () => { restoreSite(); restoreRecommendations(); });
+import { enhanceSiteMetrics, restoreSiteMetrics } from './local-metrics';
+installSkin('site', () => { enhanceSite(); enhanceRecommendations(); enhanceSiteMetrics(); }, () => { restoreSite(); restoreRecommendations(); restoreSiteMetrics(); });
