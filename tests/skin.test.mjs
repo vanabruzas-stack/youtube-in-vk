@@ -10,7 +10,7 @@ const manifest = JSON.parse(await readFile(resolve(dist, 'manifest.json'), 'utf8
 
 test('the reverse extension has its own manifest and limits permissions', () => {
   assert.equal(manifest.name, 'YouTube');
-  assert.equal(manifest.version, '0.3.1');
+  assert.equal(manifest.version, '0.3.2');
   assert.deepEqual(manifest.permissions, ['storage']);
   assert.ok(manifest.content_scripts[0].matches.includes('https://vkvideo.ru/*'));
   assert.ok(manifest.content_scripts[1].matches.includes('https://cabinet.vkvideo.ru/*'));
@@ -105,6 +105,10 @@ test('guide tracks native layout and shows real subscription names', async () =>
     assert.equal(await page.locator('#vky-featured-home .vky-featured-card').count(), 3);
     assert.equal(await page.locator('#vky-featured-home').evaluate(e => e.nextElementSibling?.id), 'grid');
     assert.equal(await page.locator('#grid').evaluate(e => getComputedStyle(e).getPropertyValue('--grid-columns').trim()), '3');
+    await page.evaluate(() => history.pushState({}, '', '/@sodyan/all'));
+    await page.locator('html.vky-channel').waitFor();
+    assert.equal(await page.locator('#grid').evaluate(e => getComputedStyle(e).getPropertyValue('--grid-columns').trim()), '3');
+    assert.equal(await page.locator('#grid').evaluate(e => e.classList.contains('vky-main-grid')), false);
     const before = await page.evaluate(() => ({ guide: document.querySelector('#vky-guide').getBoundingClientRect().right, content: document.querySelector('#content').getBoundingClientRect().left }));
     assert.ok(before.content >= before.guide, JSON.stringify(before));
     await page.locator('[data-testid="video_left_menu_toggle"]').click();
